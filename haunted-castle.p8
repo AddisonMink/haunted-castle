@@ -67,10 +67,6 @@ function _update()
 			state = "playing"
 		end
 	end
-
-	if debug_msg then
-		print(debug_msg, 0, 0, 8)
-	end
 end
 
 function _draw()
@@ -148,16 +144,6 @@ function _draw()
 end
 -->8
 -- lib
-
--- util
-
-function count_keys(tbl)
-	local n = 0
-	for _ in pairs(tbl) do
-		n += 1
-	end
-	return n
-end
 
 -- geometry
 
@@ -358,8 +344,10 @@ function switch_system()
 		local on_switch = overlaps_tile(plyr, s.tx, s.ty)
 
 		if on_switch then
-			s.exec()
-			del(room.switches, s)
+			local keep = s.exec()
+			if not keep then
+				del(room.switches, s)
+			end
 		end
 	end
 end
@@ -673,10 +661,6 @@ function update_shambler(me)
 		try_move(me, dir, spd)
 		me.hurtbox.x = me.x
 		me.hurtbox.y = me.y
-
-		if me.x < 0 or me.y < 0 then
-			debug_msg = dir.x .. "," .. dir.y
-		end
 
 		set_walk_frame(
 			me,
@@ -1488,6 +1472,8 @@ function room_5(id, x, y)
 			function()
 				if room.book == 35 then
 					set_tile(11, 6, 0)
+				else
+					return true
 				end
 			end
 		)
@@ -1651,7 +1637,6 @@ function room_8(id, x, y)
 						- 6
 				room.entities[4].kill(room.entities[4])
 				room.entities[4] = nil
-				debug_msg = x .. "" .. y
 				room.entities[5] = mk_phantom(5, x, y)
 				room.next_entity = 6
 				room.phantom = true
