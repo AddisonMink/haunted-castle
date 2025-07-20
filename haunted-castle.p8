@@ -1428,6 +1428,14 @@ function room_5(id, x, y)
 		add_exit(7, 13, 601)
 		add_exit(8, 13, 601)
 
+		-- rest book tiles
+		set_tile(3, 3, 51)
+		set_tile(5, 3, 4)
+		set_tile(7, 3, 35)
+		set_tile(3, 10, 4)
+		set_tile(5, 10, 35)
+		set_tile(7, 10, 19)
+
 		add_player(x, y)
 
 		function book_switch(x, y, id)
