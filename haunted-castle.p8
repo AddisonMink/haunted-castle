@@ -20,11 +20,11 @@ player_sword = {
 
 -- global state
 debug_msg = nil
-weapon = player_sword
+weapon = nil
 spell = nil
 spell_cnt = 1
 room = nil
-room_id = 601
+room_id = 101
 blue_key = false
 green_key = false
 red_key = false
