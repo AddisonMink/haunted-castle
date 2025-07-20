@@ -20,11 +20,11 @@ player_sword = {
 
 -- global state
 debug_msg = nil
-weapon = nil
+weapon = player_sword
 spell = nil
 spell_cnt = 1
 room = nil
-room_id = 101
+room_id = 601
 blue_key = false
 green_key = false
 red_key = false
@@ -396,6 +396,10 @@ function draw_small_sprite(body)
 end
 
 function draw_big_sprite(body)
+	if body.flashing then
+		lighten_palette()
+	end
+
 	local x = body.x + (body.w - 16) / 2
 	local y = body.y + (body.h - 16) / 2
 	local s_0_0 = body.big_sprite
@@ -427,6 +431,10 @@ function draw_big_sprite(body)
 		1, 1,
 		body.flip_x, body.flip_y
 	)
+
+	if body.flashing then
+		pal()
+	end
 end
 
 function draw_long_sprite(body)
@@ -447,6 +455,13 @@ function draw_tall_sprite(body)
 
 	spr(s_0_0, x, y)
 	spr(s_0_1, x, y + 8)
+end
+
+function lighten_palette()
+	for i = 0, 15 do
+		local r, g, b = pal(i)
+		pal(i, 7)
+	end
 end
 
 function print_centered(msg, sub_msg)
@@ -881,6 +896,7 @@ end
 
 function update_tree(me)
 	local dur = 2
+	local flash_dur = 0.2
 
 	local plyr = room.entities[0]
 	if not plyr then return end
@@ -890,10 +906,17 @@ function update_tree(me)
 		local x = plyr.x + plyr.w / 2 - 2
 		local y = plyr.y + 8
 		local id = room.next_entity
-		room.entities[id] = mk_root(id, x, y)
+		room.entities[id] = mk_root(id, x, y, me.id)
 
 		room.next_entity += 1
 		me.timer = dur
+	end
+
+	if me.flashing then
+		me.flash_timer += 1 / 30
+		if me.flash_timer >= flash_dur then
+			me.flashing = false
+		end
 	end
 
 	me.flip_x = flr(time() * 2) % 2 == 1
@@ -901,7 +924,7 @@ end
 
 -- root
 
-function mk_root(id, x, y)
+function mk_root(id, x, y, tree_id)
 	local me = { x = x, y = y, w = 4, h = 8 }
 	me.id = id
 	me.sprite = 11
@@ -917,6 +940,7 @@ function mk_root(id, x, y)
 		h = me.h,
 		layer = "player"
 	}
+	me.tree_id = tree_id
 	add(room.hurtboxes, me.hurtbox)
 	return me
 end
@@ -954,6 +978,14 @@ end
 function kill_root(me)
 	del(room.hurtboxes, me.hurtbox)
 	room.roots_killed += 1
+
+	if me.tree_id then
+		local tree = room.entities[me.tree_id]
+		if tree then
+			tree.flashing = true
+			tree.flash_timer = 0
+		end
+	end
 end
 
 -- orb
