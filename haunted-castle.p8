@@ -24,7 +24,7 @@ weapon = player_sword
 spell = nil
 spell_cnt = 1
 room = nil
-room_id = 901
+room_id = 601
 blue_key = false
 green_key = false
 red_key = false
@@ -979,7 +979,7 @@ function kill_root(me)
 	del(room.hurtboxes, me.hurtbox)
 	room.roots_killed += 1
 
-	if me.tree_id then
+	if me.tree_id and room.roots_killed <= 2 then
 		local tree = room.entities[me.tree_id]
 		if tree then
 			tree.flashing = true
